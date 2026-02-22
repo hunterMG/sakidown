@@ -677,8 +677,16 @@ export class StoragePipeline {
         }
     }
 
+    async _waitForBackpressure(controller) {
+        // 当底层缓冲区已满时，暂停读取，直到浏览器消化完数据
+        while (controller.desiredSize !== null && controller.desiredSize <= 0) {
+            if (this.abortController.signal.aborted) throw new DOMException('Aborted', 'AbortError');
+            await new Promise((resolve) => setTimeout(resolve, 50));
+        }
+    }
+
     async transfer(controller) {
-        const CHUNK_READ_SIZE = 16 * 1024 * 1024;
+        const CHUNK_READ_SIZE = 2 * 1024 * 1024;
 
         await this.vStore.init();
         if (this.hasAudio && !this.rawMode) await this.aStore.init();
@@ -690,6 +698,7 @@ export class StoragePipeline {
             const sourceStore = this.activeRawStore || this.vStore;
 
             while (remaining > 0) {
+                await this._waitForBackpressure(controller); // 等待 NAS 写入完毕，释放背压
                 const readSize = Math.min(remaining, CHUNK_READ_SIZE);
                 const buffer = await sourceStore.read(currentOffset, readSize);
 
@@ -737,6 +746,7 @@ export class StoragePipeline {
                 let currentFileOffset = chunk.fileOffset;
 
                 while (remaining > 0) {
+                    await this._waitForBackpressure(controller); // 等待 NAS 写入完毕，释放背压
                     const readSize = Math.min(remaining, CHUNK_READ_SIZE);
                     const buffer = await store.read(currentFileOffset, readSize);
 
