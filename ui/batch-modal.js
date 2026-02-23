@@ -275,7 +275,7 @@ class BatchModal {
         }
 
         if (config.cover) groups.attachments.push('封面');
-        if (config.danmaku) groups.attachments.push('弹幕');
+        if (config.danmaku) groups.attachments.push(config.danmaku === 'ass' ? 'ASS弹幕' : 'XML弹幕');
         const hasContent = groups.media.length > 0 || groups.codec.length > 0 || groups.attachments.length > 0;
 
         if (!hasContent) {

@@ -89,14 +89,20 @@ export function renderTaskCard(item, type) {
         if (data.audioCodec === 'FLAC') tags.push(`<span class="ud-tag">Hi-Res无损</span>`);
 
         if (status.attachments) {
-            const attMap = { cover: '封面', danmaku: '弹幕', subtitle: '字幕' };
+            const attMap = { cover: '封面', subtitle: '字幕' };
 
             status.attachments.forEach((att) => {
-                const label = attMap[att.type] || att.type;
+                let label;
+                if (att.type === 'danmaku') {
+                    label = att.format === 'ass' ? 'ASS弹幕' : 'XML弹幕';
+                } else {
+                    label = attMap[att.type] || att.type;
+                }
 
                 tags.push(`<span class="ud-tag">${label}</span>`);
             });
         }
+
 
         if (tags.length > 0) {
             midRightHtml = tags.join('');
@@ -224,11 +230,14 @@ export function updateTaskCard(element, item, type) {
             if (data.audioCodec === 'FLAC') tags.push(`<span class="ud-tag">Hi-Res无损</span>`);
 
             if (status.attachments) {
-                const attMap = { cover: '封面', danmaku: '弹幕', subtitle: '字幕' };
-
+                const attMap = { cover: '封面', subtitle: '字幕' };
                 status.attachments.forEach((att) => {
-                    const label = attMap[att.type] || att.type;
-
+                    let label;
+                    if (att.type === 'danmaku') {
+                        label = att.format === 'ass' ? 'ASS弹幕' : 'XML弹幕';
+                    } else {
+                        label = attMap[att.type] || att.type;
+                    }
                     tags.push(`<span class="ud-tag">${label}</span>`);
                 });
             }

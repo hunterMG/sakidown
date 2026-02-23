@@ -246,7 +246,7 @@ class StrategiesPanel {
             }
 
             if (danmaku) {
-                tags.push('弹幕');
+                tags.push(danmaku === 'ass' ? 'ASS弹幕' : 'XML弹幕');
             }
         }
 
@@ -310,12 +310,19 @@ class StrategiesPanel {
 
     async _loadStrategies() {
         const { STRATEGY_CONSTANTS: STRATEGY_CONSTANTS, DEFAULT_STRATEGIES: DEFAULT_STRATEGIES } = window.Strategies;
-
         return new Promise((resolve) => {
             chrome.storage.local.get([STRATEGY_CONSTANTS.STORAGE_KEY], (res) => {
                 const saved = res[STRATEGY_CONSTANTS.STORAGE_KEY];
-
                 this.strategies = saved && saved.length > 0 ? saved : DEFAULT_STRATEGIES;
+                // 兼容旧数据：danmaku: true → 'xml'
+                let needsSave = false;
+                this.strategies.forEach(st => {
+                    if (st.config && st.config.danmaku === true) {
+                        st.config.danmaku = 'xml';
+                        needsSave = true;
+                    }
+                });
+                if (needsSave) this._saveStrategies();
                 resolve();
             });
         });

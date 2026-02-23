@@ -98,15 +98,11 @@ class TaskResolver {
         }
 
         if (config.danmaku && task.metadata.danmaku_url) {
-            let fmt = 'xml';
-            const reqFmt = config.danmaku_format || 'xml';
-
-            if (reqFmt === 'xml') {
-                fmt = 'xml';
-            } else {
-                fmt = 'xml';
-            }
-
+            // 新格式: danmaku 本身是 'xml'/'ass'
+            // 旧格式兼容: danmaku 是 boolean true，读 danmaku_format 字段
+            const fmt = (typeof config.danmaku === 'string')
+                ? config.danmaku
+                : (config.danmaku_format || 'xml');
             task.status.attachments.push({
                 type: 'danmaku',
                 format: fmt,

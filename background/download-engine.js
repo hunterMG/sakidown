@@ -27,6 +27,8 @@ import { exportManager } from './export-manager.js';
 import { statusManager } from './status-manager.js';
 import { historyManager } from './history-manager.js';
 import { ErrorHandler } from './error-handler.js';
+import { convertDanmakuToAss } from './danmaku-converter.js';
+
 class DownloadEngine {
     constructor() {
         this.isProcessing = false;
@@ -361,10 +363,15 @@ class DownloadEngine {
             try {
                 // 使用动态获取的 url 进行请求
                 const res = await fetch(url, { referrerPolicy: 'no-referrer', signal: controller.signal });
-
                 if (!res.ok) throw new Error(`Sidecar HTTP ${res.status}`);
-                const blob = await res.blob();
-
+                let blob;
+                if (att.type === 'danmaku' && att.format === 'ass') {
+                    const xmlText = await res.text();
+                    const assText = this._convertDanmakuToAss(xmlText); // TODO: XML→ASS 转换，稍后实现
+                    blob = new Blob([assText], { type: 'text/plain' });
+                } else {
+                    blob = await res.blob();
+                }
                 clearTimeout(timeoutId);
                 const dataUrl = await new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -387,6 +394,10 @@ class DownloadEngine {
                 throw e;
             }
         }
+    }
+
+    _convertDanmakuToAss(xmlText) {
+        return convertDanmakuToAss(xmlText);
     }
 
     async cancelCurrentTask() {

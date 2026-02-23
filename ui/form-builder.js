@@ -101,14 +101,19 @@ class FormBuilder {
                 });
                 break;
 
-            case 'select':
+            case 'select': {
+                const viewValue = config.toView ? config.toView(currentValue) : currentValue;
                 control = DOM.createCustomSelect({
-                    value: currentValue,
+                    value: viewValue,
                     options: config.options || [],
                     layout: config.layout || 'between',
-                    onChange: (e) => this._updateModel(config.key, e.target.value)
+                    onChange: (e) => {
+                        const modelValue = config.toModel ? config.toModel(e.target.value) : e.target.value;
+                        this._updateModel(config.key, modelValue);
+                    }
                 });
                 break;
+            }
             
             default:
                 console.warn(`[FormBuilder] Unknown type: ${config.type}`);
@@ -182,14 +187,16 @@ class FormBuilder {
                 ? control.getValue() 
                 : (config.type === 'switch' ? control.checked : control.value);
             
-            if (modelVal !== viewVal) {
+            // 对有 toView 转换的字段，使用转换后的值进行比较和设置
+            const displayVal = config.toView ? config.toView(modelVal) : modelVal;
+            if (displayVal !== viewVal) {
                 // 4. 更新视图值 (支持自定义组件与原生 DOM 兜底)
                 if (control.setValue) {
-                    control.setValue(modelVal);
+                    control.setValue(displayVal);
                 } else if (config.type === 'switch') {
                     control.checked = !!modelVal;
                 } else {
-                    control.value = modelVal === undefined ? '' : modelVal;
+                    control.value = displayVal === undefined ? '' : displayVal;
                 }
             }
         });

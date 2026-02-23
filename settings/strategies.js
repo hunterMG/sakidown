@@ -39,6 +39,12 @@ const CODEC_OPTIONS = [
     { value: 'avc', label: 'AVC' },
 ];
 
+const DANMAKU_OPTIONS = [
+    { value: '', label: '不下载' },
+    { value: 'xml', label: 'XML弹幕' },
+    { value: 'ass', label: 'ASS弹幕' },
+];
+
 const STRATEGY_SCHEMA = [
     {
         type: 'section',
@@ -133,8 +139,12 @@ const STRATEGY_SCHEMA = [
             },
             {
                 key: 'config.danmaku',
-                type: 'switch',
-                label: 'XML弹幕'
+                type: 'select',
+                label: '弹幕',
+                options: DANMAKU_OPTIONS,
+                layout: 'between',
+                toView: (v) => (typeof v === 'string') ? v : '',
+                toModel: (v) => v || false,
             }
         ]
     }
@@ -156,7 +166,6 @@ const DEFAULT_STRATEGIES = [
             cover: false,
             cover_format: 'jpg',
             danmaku: false,
-            danmaku_format: 'xml',
         },
     },
     {
@@ -172,8 +181,7 @@ const DEFAULT_STRATEGIES = [
             merge: true,
             cover: true,
             cover_format: 'jpg',
-            danmaku: true,
-            danmaku_format: 'xml',
+            danmaku: 'xml',
         },
     },
     {
@@ -190,7 +198,6 @@ const DEFAULT_STRATEGIES = [
             cover: false,
             cover_format: 'jpg',
             danmaku: false,
-            danmaku_format: 'xml',
         },
     },
 ];
@@ -198,7 +205,7 @@ const DEFAULT_STRATEGIES = [
 function validatestrategy_config(config) {
     if (!config) return false;
 
-    return config.video === true || config.audio === true || config.cover === true || config.danmaku === true;
+    return config.video === true || config.audio === true || config.cover === true || !!config.danmaku;
 }
 
 function validateStrategyName(name) {
@@ -244,7 +251,6 @@ function createNewStrategy() {
             cover: false,
             cover_format: 'jpg',
             danmaku: false,
-            danmaku_format: 'xml',
         },
     };
 }
