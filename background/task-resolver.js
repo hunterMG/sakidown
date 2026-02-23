@@ -81,15 +81,9 @@ class TaskResolver {
         const config = task.preference.strategy_config || {};
 
         if (config.cover && task.metadata.cover_url) {
-            let fmt = 'jpg';
-            const reqFmt = config.cover_format || 'jpg';
-
-            if (reqFmt === 'jpg') {
-                fmt = 'jpg';
-            } else {
-                fmt = 'jpg';
-            }
-
+            const fmt = (typeof config.cover === 'string')
+                ? config.cover
+                : (config.cover_format || 'jpg');
             task.status.attachments.push({
                 type: 'cover',
                 format: fmt,

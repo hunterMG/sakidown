@@ -317,8 +317,21 @@ class StrategiesPanel {
                 // 兼容旧数据：danmaku: true → 'xml'
                 let needsSave = false;
                 this.strategies.forEach(st => {
-                    if (st.config && st.config.danmaku === true) {
+                    if (!st.config) return;
+                    if (st.config.danmaku === true) {
                         st.config.danmaku = 'xml';
+                        needsSave = true;
+                    }
+                    if (st.config.cover === true) {
+                        st.config.cover = 'jpg';
+                        needsSave = true;
+                    }
+                    if ('danmaku_format' in st.config) {
+                        delete st.config.danmaku_format;
+                        needsSave = true;
+                    }
+                    if ('cover_format' in st.config) {
+                        delete st.config.cover_format;
                         needsSave = true;
                     }
                 });

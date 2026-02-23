@@ -45,6 +45,11 @@ const DANMAKU_OPTIONS = [
     { value: 'ass', label: 'ASS弹幕' },
 ];
 
+const COVER_OPTIONS = [
+    { value: '', label: '不下载' },
+    { value: 'jpg', label: 'JPG封面' },
+];
+
 const STRATEGY_SCHEMA = [
     {
         type: 'section',
@@ -134,8 +139,12 @@ const STRATEGY_SCHEMA = [
         children: [
             {
                 key: 'config.cover',
-                type: 'switch',
-                label: '视频封面'
+                type: 'select',
+                label: '封面',
+                options: COVER_OPTIONS,
+                layout: 'between',
+                toView: (v) => (typeof v === 'string') ? v : '',
+                toModel: (v) => v || false,
             },
             {
                 key: 'config.danmaku',
@@ -164,7 +173,6 @@ const DEFAULT_STRATEGIES = [
             codec: { primary: 'av1', secondary: 'hevc' },
             merge: true,
             cover: false,
-            cover_format: 'jpg',
             danmaku: false,
         },
     },
@@ -179,8 +187,7 @@ const DEFAULT_STRATEGIES = [
             quality: { primary: 'best', secondary: 'dolby' },
             codec: { primary: 'av1', secondary: 'hevc' },
             merge: true,
-            cover: true,
-            cover_format: 'jpg',
+            cover: 'jpg',
             danmaku: 'xml',
         },
     },
@@ -196,7 +203,6 @@ const DEFAULT_STRATEGIES = [
             codec: { primary: 'av1', secondary: 'hevc' },
             merge: false,
             cover: false,
-            cover_format: 'jpg',
             danmaku: false,
         },
     },
@@ -205,7 +211,7 @@ const DEFAULT_STRATEGIES = [
 function validatestrategy_config(config) {
     if (!config) return false;
 
-    return config.video === true || config.audio === true || config.cover === true || !!config.danmaku;
+    return config.video === true || config.audio === true || !!config.cover || !!config.danmaku;
 }
 
 function validateStrategyName(name) {
@@ -249,7 +255,6 @@ function createNewStrategy() {
             codec: { primary: 'av1', secondary: 'hevc' },
             merge: true,
             cover: false,
-            cover_format: 'jpg',
             danmaku: false,
         },
     };
