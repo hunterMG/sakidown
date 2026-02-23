@@ -160,18 +160,37 @@ class FormBuilder {
             // 处理 disabledIf (禁用/启用)
             if (config.disabledIf && typeof config.disabledIf === 'function') {
                 const shouldDisable = config.disabledIf(this.formData);
+                
+                // 1. 更新 UI 禁用状态 (支持自定义组件与原生 DOM 兜底)
                 if (control.setDisabled) {
                     control.setDisabled(shouldDisable);
+                } else {
+                    control.disabled = shouldDisable;
+                }
+
+                // 2. 状态联动：如果被禁用，且配置了 valueOnDisable 属性，则重置为该值
+                if (shouldDisable && 'valueOnDisable' in config) {
+                    this._setValueByPath(this.formData, config.key, config.valueOnDisable);
                 }
             }
             
             // 处理 value 联动 (如果数据被外部修改，或者联动导致数据重置)
             // 注意：这里简单比对，避免循环触发
             const modelVal = this._getValueByPath(this.formData, config.key);
-            const viewVal = control.getValue ? control.getValue() : null;
+            // 3. 获取视图值 (支持自定义组件与原生 DOM 兜底)
+            const viewVal = control.getValue 
+                ? control.getValue() 
+                : (config.type === 'switch' ? control.checked : control.value);
             
-            if (modelVal !== viewVal && control.setValue) {
-                control.setValue(modelVal);
+            if (modelVal !== viewVal) {
+                // 4. 更新视图值 (支持自定义组件与原生 DOM 兜底)
+                if (control.setValue) {
+                    control.setValue(modelVal);
+                } else if (config.type === 'switch') {
+                    control.checked = !!modelVal;
+                } else {
+                    control.value = modelVal === undefined ? '' : modelVal;
+                }
             }
         });
     }

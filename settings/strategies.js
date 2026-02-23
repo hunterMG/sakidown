@@ -73,51 +73,52 @@ const STRATEGY_SCHEMA = [
                 type: 'switch',
                 label: '合并音视频',
                 note: '将视频和音频流合并为单个文件',
-                disabledIf: (data) => !data.config.video || !data.config.audio
+                disabledIf: (data) => !data.config.video || !data.config.audio,
+                valueOnDisable: false
             }
         ]
     },
     {
         type: 'section',
         title: '偏好画质',
-        // 只有开启视频时才显示画质选择
-        showIf: (data) => !!data.config.video,
         children: [
             {
                 key: 'config.quality.primary',
                 type: 'select',
                 label: '首选画质',
                 options: QUALITY_OPTIONS,
-                layout: 'between'
+                layout: 'between',
+                disabledIf: (data) => !data.config.video
             },
             {
                 key: 'config.quality.secondary',
                 type: 'select',
                 label: '次选画质',
                 options: QUALITY_OPTIONS,
-                layout: 'between'
+                layout: 'between',
+                disabledIf: (data) => !data.config.video
             }
         ]
     },
     {
         type: 'section',
         title: '偏好编码',
-        // 只有开启视频时才显示编码选择
-        showIf: (data) => !!data.config.video,
         children: [
             {
                 key: 'config.codec.primary',
                 type: 'select',
                 label: '首选编码',
                 options: CODEC_OPTIONS,
-                layout: 'between'
+                layout: 'between',
+                disabledIf: (data) => !data.config.video
             },
             {
                 key: 'config.codec.secondary',
                 type: 'select',
                 label: '次选编码',
                 options: CODEC_OPTIONS,
-                layout: 'between'
+                layout: 'between',
+                disabledIf: (data) => !data.config.video
             }
         ]
     },

@@ -894,6 +894,19 @@ input:checked + .ud-slider:before {
     margin-bottom: 0;
 }
 
+/* [新增] 下拉选择框禁用状态 (视觉变灰) */
+.ud-select-wrapper.disabled {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
+
+/* 确保在禁用状态下鼠标移入显示禁止符号 
+   注意: 由于 JS 中设置了 container 的 pointer-events: none
+   我们需要把禁止光标加在外层 wrapper 上 */
+.ud-select-wrapper.disabled:hover {
+    cursor: not-allowed;
+}
+
 /* [新增] 选择器本体容器 (替代 JS 中的 style.position/width) */
 .ud-custom-select-container {
     position: relative;
